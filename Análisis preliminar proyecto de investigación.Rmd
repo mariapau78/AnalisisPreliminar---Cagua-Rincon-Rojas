@@ -5,6 +5,7 @@ date: "21/5/2021"
 output: word_document
 ---
 ---
+
 ## Pregunta e hipótesis de investigación
 
 El crecimiento económico y social a nivel global, ha estado estrechamente relacionado con procesos de industrialización en los que la inclusión de maquinaria y factores de producción han sido determinantes. La inclusión de estos equipos en el proceso productivo ha generado nuevas necesidades dentro de la sociedad, entre ellas el uso de energía que ,a su vez ,tiene un impacto negativo sobre el medio ambiente; el impacto del desarrollo a nivel global ha sido catalogado como una externalidad ambiental negativa, pues se ha asociado que altos niveles de emisión de CO2 son producto del desarrollo industrial.
@@ -13,15 +14,114 @@ El impacto negativo de procesos industriales sobre el medio ambiente ha sido foc
 
 Teniendo en cuenta que el desarrollo de muchos países está ligado a altos niveles de emisión de CO2 y por ende, fue necesario acudir a nuevas alternativas amigables con el medio ambiente; ¿Es posible afirmar que el nivel de desarrollo en el año 2018 tiene un impacto menor sobre los niveles de emisión de CO2, tomando como referencia el impacto en el año 1998?
 
-## Descripción de modelos a estimar 
+## Descripción de modelos a estimar
 
-Modelo 1:
+La metodología adoptada para el presente caso de estudio consiste en la estimación de dos modelos de regresión lineal por mínimos cuadrados ordinales (MCO) para cada uno de los años de estudio (1998 y 2018, respectivamente). Los modelos a estimar se encuentran a continuación, tomando como variable dependiente la emisión de CO2 (CO2), como variable independiente el PIB per cápita ($PIB_{percapita}$) y como variables de control el nivel industrial como proporción del PIB (Industria), el Índice de Desarrollo Humano (IDH) y la densidad poblacional (Población); tras realizar la estimación de ambos modelos, se compararán los coeficientes estimados para verificar la hipótesis planteada.
 
-$CO2_{1998} = \beta_0 + \beta_1 ln(PIB_{percapita_{1998}}) + \beta_2 Industria_{1998} + \beta_3 IDH_{1998} + \beta_4 Población_{1998} + u_i$
+*Modelo 1:*
 
-Modelo 2:
+$CO2_{1998} = \beta_0 + \beta_1 ln(PIB_{percapita_{1998}}) + \beta_2 Industria_{1998} + \beta_3 IDH_{1998} + \beta_4 ln(Población_{1998}) + u_i$
 
-$CO2_{2018} = \beta_0 + \beta_1 ln(PIB_{per capita_{2018}}) + \beta_2 Industria_{2018} + \beta_3 IDH_{2018} + \beta_4 Población_{2018} + u_i$
+*Modelo 2:*
+
+$CO2_{2018} = \beta_0 + \beta_1 ln(PIB_{per capita_{2018}}) + \beta_2 Industria_{2018} + \beta_3 IDH_{2018} + \beta_4 ln(Población_{2018}) + u_i$
+
+## Activar paquetes 
+
+```{r}
+library(tidyverse)
+library(stargazer)
+library(readxl)
+library(modelsummary)
+library(lindia)
+library(flextable)
+```
+
+## Cargar base de datos 
+
+```{r}
+BasesWB <- list.files("WB/")
+for (i in seq_along(BasesWB)) {
+  datos <- read_xlsx(paste0("WB/", BasesWB[i]), skip = 3)
+  datos <- datos %>% select("Country Name", "1998", "2018")
+  datos <- datos %>% rename(Pais = `Country Name`)
+  assign(BasesWB[i],datos)
+}
+
+WB <- left_join(Industria.xlsx, left_join(Ingreso.xlsx, Poblacion.xlsx, by = "Pais"), by = "Pais")
+
+BasesWBG <- list.files("WBG/")
+for (i in seq_along(BasesWBG)) {
+  datos <- read_xlsx(paste0("WBG/", BasesWBG[i]))
+  datos <- datos %>% select("country", "1998", "2018")
+  datos <- datos %>% rename(Pais = `country`)
+  assign(BasesWBG[i],datos)
+}
+
+WBG <- left_join(Emision.xlsx, IDH.xlsx, by = "Pais")
+
+Base_Final <- left_join(WB, WBG, by = "Pais")
+Base_Final <- drop_na(Base_Final)
+```
+
+_Renombrar variables_
+
+```{r}
+Base_Final <- Base_Final %>% rename(Industria98 = `1998`, Industria18 = `2018`, Ingreso98 = `1998.x.x`, Ingreso18 = `2018.x.x`, Poblacion98 = `1998.y.x`, Poblacion18 = `2018.y.x`, Emision98 = `1998.x.y`, Emision18 = `2018.x.y`, IDH98 = `1998.y.y`, IDH18 = `2018.y.y`)
+```
+
+_Aplicar logaritmo natural a las variables establecidas en el modelo y seleccionar las variables a utilizar_
+
+```{r}
+Base_Final <- Base_Final %>% mutate(Ln_Ingreso98 = log(Ingreso98), Ln_Ingreso18 = log(Ingreso18), Ln_Poblacion98 = log(Poblacion98), Ln_Poblacion18 = log(Poblacion18))
+  
+Base_Final <- Base_Final %>% select(c("Pais", "Industria98", "Industria18", "Emision98", "Emision18", "IDH98", "IDH18", "Ln_Ingreso98", "Ln_Ingreso18", "Ln_Poblacion98", "Ln_Poblacion18")) 
+
+attach(Base_Final)
+```
+
+_Estimación del modelo_ 
+
+```{r}
+modelo_1 <- lm(Emision98 ~ Ln_Ingreso98 + Industria98 + IDH98 + Ln_Poblacion98)
+```
+```{r}
+modelo_2 <- lm(Emision18 ~ Ln_Ingreso18 + Industria18 + IDH18 + Ln_Poblacion18)
+```
 
 ## Resultados de los modelos estimados 
+
+```{r}
+Modelos <- list("Modelo 98" = modelo_1, "Modelo 18" = modelo_2)
+modelsummary(Modelos, output = "resultados.docx")
+```
+
+## Gráficas para comparar coeficientes de los modelos
+
+```{r}
+##modelplot(Modelos) + labs( title = "Comparación de modelos")
+```
+
+## Revisión de los principales supuestos de los modelos a estimar
+
+Los 5 supuestos claves de la regresión son:
+
+1. Normalidad.
+2. Independencia.
+3. Linealidad. 
+4. Homocedasticidad.
+5. Multicolinealidad.
+
+```{r}
+gg_diagnose(modelo_1)
+```
+
+_ Revisión de supuestos para el primer modelo_ 
+
+```{r}
+```
+
+
+
+## Análisis preliminar de los resultados 
 
