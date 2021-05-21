@@ -1,0 +1,27 @@
+---
+title: "Análisis Preliminar"
+author: "Cagua Vega, Juliana Andrea; Rincón Cepeda, María Paula; Rojas Goméz, Santiago"
+date: "21/5/2021"
+output: word_document
+---
+---
+## Pregunta e hipótesis de investigación
+
+El crecimiento económico y social a nivel global, ha estado estrechamente relacionado con procesos de industrialización en los que la inclusión de maquinaria y factores de producción han sido determinantes. La inclusión de estos equipos en el proceso productivo ha generado nuevas necesidades dentro de la sociedad, entre ellas el uso de energía que ,a su vez ,tiene un impacto negativo sobre el medio ambiente; el impacto del desarrollo a nivel global ha sido catalogado como una externalidad ambiental negativa, pues se ha asociado que altos niveles de emisión de CO2 son producto del desarrollo industrial.
+
+El impacto negativo de procesos industriales sobre el medio ambiente ha sido foco de debate durante varios años, organizaciones multilaterales se han enfocado en llegar a acuerdos con países cuyas emisiones están por encima del promedio. Acuerdos internacionales que países cada cierto periodo de tiempo ratifican, han generado una serie de incentivos para la búsqueda de nuevas tecnologías amigables con el medio ambiente; países desarrollados han implementado procesos productivos en los que el impacto negativo se reduce significativamente.
+
+Teniendo en cuenta que el desarrollo de muchos países está ligado a altos niveles de emisión de CO2 y por ende, fue necesario acudir a nuevas alternativas amigables con el medio ambiente; ¿Es posible afirmar que el nivel de desarrollo en el año 2018 tiene un impacto menor sobre los niveles de emisión de CO2, tomando como referencia el impacto en el año 1998?
+
+## Descripción de modelos a estimar 
+
+Modelo 1:
+
+$CO2_{1998} = \beta_0 + \beta_1 ln(PIB_{percapita_{1998}}) + \beta_2 Industria_{1998} + \beta_3 IDH_{1998} + \beta_4 Población_{1998} + u_i$
+
+Modelo 2:
+
+$CO2_{2018} = \beta_0 + \beta_1 ln(PIB_{per capita_{2018}}) + \beta_2 Industria_{2018} + \beta_3 IDH_{2018} + \beta_4 Población_{2018} + u_i$
+
+## Resultados de los modelos estimados 
+
